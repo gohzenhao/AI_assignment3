@@ -7,13 +7,12 @@ import java.util.List;
 import java.util.StringTokenizer;
 
 
-public class Driver {
-	
+public class Driver {	
 
 	
 	public static void main(String[] args){
 		
-		File inputFile = new File("C:\\Users\\gohzenhao\\workspace\\Assignment3\\bronze1.txt");
+		File inputFile = new File("C:\\Users\\User-PC\\eclipse-workspace\\AI-ass3\\bronze1.txt");
 
 		FileReader fr = null;
 		BufferedReader br = null;
@@ -48,29 +47,28 @@ public class Driver {
 						counter++;
 						if(counter==1){
 							customerType = line;
-							
 							maxFund = 3;
 							additionalFund = 3;
 							numOfVentures = 2;
 							
-							//This part is not working --------
-								if(customerType=="bronze"){
+							//This part is working now--------
+								if(customerType.equalsIgnoreCase("bronze")){
 									System.out.println("why");
 									maxFund = 3;
 									additionalFund = 3;
 									numOfVentures = 2;
 								}
-								else if(customerType=="silver"){
+								else if(customerType.equalsIgnoreCase("silver")){
 									maxFund = 5;
 									additionalFund = 4;
 									numOfVentures = 2;
 								}
-								else if(customerType=="gold"){
+								else if(customerType.equalsIgnoreCase("gold")){
 									maxFund = 6;
 									additionalFund = 4;
 									numOfVentures = 3;
 								}
-								else if(customerType=="platinum"){
+								else if(customerType.equalsIgnoreCase("platinum")){
 									maxFund = 8;
 									additionalFund = 5;
 									numOfVentures = 3;
