@@ -18,15 +18,14 @@ public class MySolver implements FundingAllocationAgent {
 	
 	private ProblemSpec spec = new ProblemSpec();
 	private VentureManager ventureManager;
-    private List<Matrix> probabilities;
-    
-    public MDP mdp;
+    private List<Matrix> probabilities;    
+    private MDP mdp;
 	
 	public MySolver(ProblemSpec spec) throws IOException {
 	    this.spec = spec;
 		ventureManager = spec.getVentureManager();
         probabilities = spec.getProbabilities();
-        this.mdp =  new MDP(spec);
+        mdp =  new MDP(spec);
 	}
 	
 	public void doOfflineComputation() {

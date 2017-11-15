@@ -3,6 +3,7 @@ package solver;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 
 import problem.ProblemSpec;
@@ -11,110 +12,151 @@ import problem.VentureManager;
 public class MDP {
 	
 	
-	public ProblemSpec problemSpec;
-	public HashMap<Integer,Integer> generateState = new HashMap<Integer,Integer>();
-	public List<Integer> currentAction;
-	public HashMap<Integer,List<Integer>> allStates = new HashMap<Integer,List<Integer>>();
-	public HashMap<Integer,List<Integer>> actionsForAState = new HashMap<Integer,List<Integer>>();
+	private ProblemSpec problemSpec;
+	private VentureManager ventureManager;
+	private HashMap<Integer,Integer> generateState = new HashMap<Integer,Integer>();
+	private List<Integer> currentAction;
+	private HashMap<List<Integer>,List<Integer>> allStates = new HashMap<List<Integer>,List<Integer>>();
+	private HashMap<List<Integer>,List<Integer>> allActions = new HashMap<List<Integer>,List<Integer>>();
+	private HashMap<List<Integer>,List<List<Integer>>> actionsForStates = new HashMap<List<Integer>,List<List<Integer>>>();
+
 	
-	public int hashMapCounter = 0;
-	
-	
-	
-	
-	
-	
-	public MDP(ProblemSpec inProblem){
-		
-		this.problemSpec = inProblem;
-		
+	public MDP(ProblemSpec inProblem){		
+		problemSpec = inProblem;
+//		ventureManager = problemSpec.getVentureManager();
+		ventureManager = new VentureManager("bronze");
 	}
 	
 	public void generateStates(){
-		
-		VentureManager ventureManager = this.problemSpec.getVentureManager();
-		
-		System.out.println("Problem loaded : "+this.problemSpec.isModelLoaded());
-		
-		System.out.println("Generating states... ");
-		
+		generateActions();
+		System.out.println("Problem loaded : "+this.problemSpec.isModelLoaded());		
+		System.out.println("Generating states... ");		
 		int maxFunds = ventureManager.getMaxManufacturingFunds();
-		
-		
-		List<Integer> fundsForFirstVenture = new ArrayList<Integer>();
 		List<Integer> validState = new ArrayList<Integer>();
-		for(int i=0;i<maxFunds+1;i++){
-			fundsForFirstVenture.add(i);
-			
-		}
-		
 		//First Venture
 		for(int i=0;i<maxFunds+1;i++){
 			//Second Venture
-			for(int u=0;u<maxFunds+1;u++){
-				
-				if(this.problemSpec.getVentureManager().getNumVentures()==2){
-					
-					if((fundsForFirstVenture.get(i)+u)<=maxFunds){
-						validState.add(fundsForFirstVenture.get(i));
+			for(int u=0;u<maxFunds+1;u++){				
+				if(ventureManager.getNumVentures()==2){					
+					if((i+u)<=maxFunds){
+						validState.add(i);
 						validState.add(u);
-						allStates.put(hashMapCounter, validState);
-						generateActionsForEachState(hashMapCounter,validState);
-						validState = new ArrayList<Integer>();
-						hashMapCounter++;
-						
+						allStates.put(validState, validState);
+						generateActionsForState(validState);
+						validState = new ArrayList<Integer>();							
 					}
 				}
 				else{
 					//Third Venture
 					for(int e=0;e<maxFunds+1;e++){
-						if((fundsForFirstVenture.get(i)+u+e)<=maxFunds){
-							validState.add(fundsForFirstVenture.get(i));
+						if((i+u+e)<=maxFunds){
+							validState.add(i);
 							validState.add(u);
 							validState.add(e);
-							allStates.put(hashMapCounter, validState);
+							allStates.put(validState, validState);
+							generateActionsForState(validState);
 							validState = new ArrayList<Integer>();
-							hashMapCounter++;
 						}
 					}
-				}
-				
+				}				
 			}
-
 		}
-		
 		
 	}
 	
-	public void generateActionsForEachState(int counter,List<Integer> inState){
-		
-//		int size = inState.size();
-//		
-//		for(int i=0;i<size;i++){
-//			
-//			int currentFund = inState.get(i);
-//			
-//		}
-//		
-		
-
+	/**
+	 * generate all possible actions for different venture manager
+	 */
+	public void generateActions()
+	{
+		Integer maxAdditionalFunding = ventureManager.getMaxAdditionalFunding();
+		List<Integer> validAction = new ArrayList<Integer>();
+		for(int i=0;i<maxAdditionalFunding+1;i++){
+			//Second Venture
+			for(int u=0;u<maxAdditionalFunding+1;u++){				
+				if(ventureManager.getNumVentures()==2){					
+					if((i+u)<=maxAdditionalFunding){
+						validAction.add(i);
+						validAction.add(u);
+						allActions.put(validAction, validAction);
+						validAction = new ArrayList<Integer>();					
+					}
+				}
+				else{
+					//Third Venture
+					for(int e=0;e<maxAdditionalFunding+1;e++){
+						if((i+u+e)<=maxAdditionalFunding){
+							validAction.add(i);
+							validAction.add(u);
+							validAction.add(e);
+							allActions.put(validAction, validAction);
+							validAction = new ArrayList<Integer>();
+						}
+					}
+				}				
+			}
+		}
+	}
+	
+	public void generateActionsForState(List<Integer> validState){
+		int v1,v2,v3=0;
+		List<List<Integer>> allPossibleActions = new ArrayList<List<Integer>>(); 
+		v1 = validState.get(0);
+		v2 = validState.get(1);
+		String name = ventureManager.getName();
+		if(name.equals("gold") || name.equals("platinum"))
+			v3 = validState.get(2);
+		//loop through allActions
+		Iterator it = allActions.entrySet().iterator();
+	    while (it.hasNext()) {
+	        HashMap.Entry pair = (HashMap.Entry)it.next();
+	        List<Integer> action = (ArrayList<Integer>) pair.getValue();
+	        int a1,a2,a3,totalFund;
+	        a1 = action.get(0);
+	        a2 = action.get(1);
+	        totalFund = a1+a2+v1+v2;
+			if(name.equals("gold") || name.equals("platinum"))
+			{
+				a3 = action.get(2);
+				totalFund = a1+a2+a3+v1+v2+v3;
+			}
+			if(totalFund <= ventureManager.getMaxAdditionalFunding())
+				allPossibleActions.add(action);
+	    }
+	    actionsForStates.put(validState, allPossibleActions);
 	}
 	
 	public static void main(String[] args) throws IOException{
 		
-		String filePath = "C:\\Users\\gohzenhao\\workspace\\Assignment3\\bronze1.txt";
+		String filePath = "C:\\Users\\User-PC\\eclipse-workspace\\AI-ass3\\testcases\\bronze1.txt";
 		
 		ProblemSpec problem = new ProblemSpec(filePath);
 		
 		MDP mdp = new MDP(problem);
 		
 		mdp.generateStates();
-		
+		mdp.generateActions();
+		System.out.println(mdp.actionsForStates.size());
 		System.out.println("All possible states : ");
+		Iterator it = mdp.allActions.entrySet().iterator();
+	    while (it.hasNext()) {
+	        HashMap.Entry pair = (HashMap.Entry)it.next();
+	        List<Integer> state = (ArrayList<Integer>) pair.getValue();
+	        System.out.println(state);
+	        System.out.println("Possible actions:");	        
+	        List<List<Integer>> actions= mdp.actionsForStates.get(state);
+	        System.out.println(actions.size());
+		    for(int i=0;i<actions.size();i++)
+		    {
+		    	System.out.println("Action "+(i+1)+":"+actions.get(i));
+		    }		        
+	    }
+    
 		
-		for(int i=0;i<mdp.hashMapCounter;i++){
-			System.out.println(mdp.allStates.get(i));
-		}
+//		System.out.println("All possible actions : ");
+//		System.out.println(mdp.allActions.toString());
+//		System.out.println(mdp.allStates.size());
+//		System.out.println(mdp.allActions.size());
 		
 	}
 
