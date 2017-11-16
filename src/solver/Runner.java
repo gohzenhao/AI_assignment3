@@ -13,9 +13,9 @@ import problem.Simulator;
 
 public class Runner {
 	/** The path for the input file. */
-	private static String inputPath = "C:\\Users\\gohzenhao\\workspace\\Assignment3\\bronze1.txt";
+	private static String inputPath = "C:\\Users\\User-PC\\eclipse-workspace\\AI-ass3\\testcases\\platinum1.txt";
 	/** The path for the output file. */
-	private static String outputPath = "C:\\Users\\gohzenhao\\workspace\\Assignment3\\answer.txt";
+	private static String outputPath = "C:\\Users\\User-PC\\eclipse-workspace\\AI-ass3\\testcases\\answer.txt";
 	
 	/** The default number of simulations to run. */
 	public static int DEFAULT_NUM_SIMULATIONS = 1;
